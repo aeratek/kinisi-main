@@ -1,0 +1,24 @@
+{
+  "name": "airquality-server",
+  "description": "data server",
+  "author": "Bryan Valentini <bryan@kinisi.cc>",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node app.js",
+    "test": "test.js"
+  },
+  "dependencies": {
+    "config": "0.4.x",
+    "express": "3.0.x",
+    "formidable": "1.0.x",
+    "node-static": "0.7.x",
+    "imagemagick": "0.1.3",
+    "coffee-script": "1.6.3",
+    "pg": "2.3.1"
+  },
+  "devDependencies": {
+    "mocha": "1.12.x"
+  },
+  "engine": "node = 0.10.x"
+}
