@@ -15,25 +15,26 @@ class Storage
             if !err
                 client.query statement, options, (err, result) ->
                     try
+                        if err then console.error err
                         cb err, result
                     catch e
                         console.error e
                     done()
             else
-                console.error 'error with client', err
+                console.error 'error with query', err
                 cb err
 
     getUidsForName: (name, cb) ->
-        @query 'SELECT 1 AS "uid"', (err, result) ->
+        @query 'select uid from dim.platform where name = $1::varchar', [name], (err, result) ->
             if !err
                 uids = result.rows?.map( (x) -> x.uid )
                 cb null, uids
             else
-                cb 'error quring for identifiers'
+                cb 'error querying for identifiers'
                 
     createPlatform: (name, cb) ->
         @query 'SELECT 1 AS "uid"', (err, result) ->
-            if err
+            if !err
                 cb null, result.rows?[0].uid
             else
                 cb 'error creating platform'
