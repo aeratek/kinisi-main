@@ -4,5 +4,9 @@
 
 class Platform
 
+    constructor: @map
+    
+    getUid: ->
+        @map.uid
 
 module.exports = Platform
