@@ -13,26 +13,35 @@ if process.env.NODE_ENV != 'superuser' and process.env.NODE_ENV != 'test'
 schemaScript = """
     create extension if not exists hstore;
     create extension if not exists "uuid-ossp";
-    
     create schema kinisi authorization internal;
     create schema dim authorization internal;
     create schema fact authorization application;
+    create sequence kinisi.local_salt_seq;
 """
 
 installScript = """
     -- kinisi.local - the system schema
     drop table if exists kinisi.local cascade;
-    create table if not exists kinisi.local(systemkey uuid primary key, name varchar(160), 
+    create table if not exists kinisi.local(
+        systemkey uuid primary key, 
+        name varchar(160) not null, 
         installed timestamp default now());
     
     -- create system UUID
-    insert into kinisi.local (systemkey, name, installed) values (uuid_generate_v1(), 
-        'kinisi_prototype', now());
+    insert into kinisi.local (systemkey, name, installed) values (
+        uuid_generate_v1(), 
+        'kinisi_prototype', 
+        now());
 
     -- dim.platform
     drop table if exists dim.platform;
-    create table if not exists dim.platform (uid uuid primary key, name varchar(160), 
-        created timestamp, current bit(2), description varchar(1000), meta hstore);            
+    create table if not exists dim.platform (
+        uid uuid primary key, 
+        name varchar(160) not null, 
+        created timestamp, 
+        current bit(2), 
+        description varchar(1000), 
+        meta hstore);            
     """
 
 # cb takes two arguments (err, result)
@@ -70,5 +79,4 @@ if process.argv[2] == '--schema'
     installSchemaDefinitions logger
 else
     installTableDefinitions logger
-
 

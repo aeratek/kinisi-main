@@ -2,90 +2,89 @@
 # abstract away the data management
 #
 config = require 'config'
-pg     = require 'pg'
 getmac = require 'getmac'
-Platform = require './platform'
+pg     = require 'pg'
 
 
 class Storage
 
     constructor: ->
-        #assume this is strong enough guarantee for uniqueness
-        @salt = Math.floor(Math.random() * 10000)
         @systemuuid = null
               
-
+    # get array of uids for a given name.
+    # names are not guaranteed unique, so several uids may match
     getUidsForName: (name, cb) ->
-        @query 'select uid from dim.platform where name = $1::varchar', [name], (err, result) ->
+        throw new Error 'invalid arguments' if !cb or !name
+        query 'select uid from dim.platform where name = $1::varchar', [name], (err, result) ->
             if !err
                 uids = result.rows?.map( (x) -> x.uid )
                 cb null, uids
             else
-                cb 'error querying for identifiers'
-
+                cb 'error querying for identifiers by name=' + name
+    
+    # get system identifier
     getSystemUuid: (cb) ->
+        throw new Error 'invalid arguments' if !cb
         return cb null, @systemuuid if @systemuuid
-        
-        getmac.getMac (err, macAddress) =>
-            return cb err if err
-
-            @query 'select systemkey from kinisi.local;', (err, result) =>
-                console.log 'getSystemUuid: ', result.rows
-                if !err
-                    @systemuuid = result.rows?[0].systemkey
-                    cb null, @systemuuid
-                else
-                    cb 'error querying system table: ' + err
+        #note: wide arrow for function callback
+        query 'select systemkey from kinisi.local;', (err, result) =>
+            if !err
+                @systemuuid = result.rows?[0].systemkey
+                cb null, @systemuuid
+            else
+                cb 'error querying for system key - db is likely corrupt'
     
-    createPlatformUid: (name, cb) ->
-        @getSystemUuid (err, uuid) =>
-            return cb err if err or uuid is null
-            
-            @salt = @salt + 1
-            stmt = 'select uuid_generate_v5($1::uuid, $2::varchar || $3::varchar || $4::varchar);'
-            params = [uuid, (new Date()).getTime(), @salt, name]
-            console.log params
-            @query stmt, params, (err, result) ->
-                if !err
-                    console.log 'returned result', JSON.stringify(result)
-                    cb null, result.rows
-                else
-                    cb 'error creating platform'
-
+    # atomicall create a new platform, returns its initial state
     createPlatform: (name, cb) ->
-        # generate a securish v5 uuid, but still using mac, time properties 
-        @getSystemUuid (err, uuid) =>
-            return cb err if err or uuid is null
-
-            @salt = @salt + 1
-            stmt = """insert into dim.platform (uid, name, created, current) 
-                        values (uuid_generate_v5($1::uuid, $2::varchar || $3::varchar || $4::varchar), $4::varchar, now(), 1::bit(2));"""
-            params = [uuid, (new Date()).getTime(), @salt, name]
-            @query stmt, params, (err, result) ->
+        throw new Error 'invalid arguments' if !cb or !name
+        # pass in the mac address for the stored procedure
+        getmac.getMac (err, macAddress) =>
+            return cb err if err or !macAddress
+            params = [name, macAddress + process.pid]
+            query 'select * from create_platform($1::varchar, $2::varchar)', params, (err, result) ->
                 if !err
-                    console.log 'returned result', JSON.stringify(result)
-                    platform = result.rows[0]
-                    cb null, new Platform(platform)
+                    platform = result.rows?[0]
+                    cb null, platform
                 else
-                    cb 'error creating platform'
+                    cb 'error creating platform with name ' + name
     
+    # should not consider this an atomic call
+    # count will be max 100
+    getPlatforms: (page, count, cb) ->
+        throw new Error 'invalid arguments' if !cb or count <= 0 or page < 0
+        count = 100 if count > 100
+        query 'select * from dim.platform limit $1::int offset $2::int', [count, page * count], (err, result) ->
+            if !err
+                cb null, result.rows || []
+            else
+                cb 'error getting platforms for page=' + page + ', count=' + count
+    
+    # returns an array of length one and only one platform, assuming it exists,
+    # otherwise returns the empty array
+    getPlatform: (uid, cb) ->
+        throw new Error 'invalid arguments' if !cb or !uid
+        query 'select * from dim.platform where uid = $1::uuid limit 1', [uid], (err, result) ->
+            if !err
+                cb null, result.rows || []
+            else
+                cb 'error querying for platform by uid=' + uid
+
     # calling this prevents anymore connections for the life of the process
     exit: ->
         pg.end()
-
-    # handle pg-client pooling
-    query: (statement, options, cb) ->
-        if typeof options is 'function'
-            cb = options
-            options = undefined
+    
+    
+    # private: handle pg-client pooling
+    query = (statement, parameters, cb) ->
+        if typeof parameters is 'function'
+            cb = parameters
+            parameters = undefined
         
-        if !cb then throw new Error 'callback required'
-        
-        console.log 'query:', statement
-
+        throw new Error 'callback required' if !cb
+        console.log 'query:', statement, ', ', parameters?.length, ' parameter(s)'
         pg.connect config.Postgres.connection, (err, client, done) =>
             if !err
-                client.query statement, options, (err, result) ->
+                client.query statement, parameters, (err, result) ->
                     done()
                     try
                         if err then console.error err
