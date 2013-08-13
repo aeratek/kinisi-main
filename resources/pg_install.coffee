@@ -86,9 +86,9 @@ installTableDefinitions = (cb) ->
             cb err, result
 
 # SQL function in a separate file
-installFunctions = (cb) ->
+installFunctions = (tablename, cb) ->
     spawn  = require('child_process').spawn
-    spawn('psql', ['-U internal', '-f resources/platformFunctions.sql'])
+    spawn('psql', ['-U', 'internal', '-f', 'resources/platformFunctions.sql', tablename])
         .on 'close', (code) ->
             error = 'exit error ' + code if code != 0
             cb error, code
@@ -117,5 +117,5 @@ else if process.argv[2] == '--table'
 else if process.argv[2] == '--extension'
     installExtensions logger
 else if process.argv[2] == '--function'
-    installFunctions logger
+    installFunctions process.argv[3], logger
 
