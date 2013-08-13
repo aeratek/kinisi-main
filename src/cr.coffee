@@ -40,3 +40,4 @@ class ChangeRequest
         throw new Error 'illegal attribute name' if attribute = '__deletes' or attribute = '__seq' or attribute = 'uid' or attribute = 'created'
 
 
+module.exports = ChangeRequest
