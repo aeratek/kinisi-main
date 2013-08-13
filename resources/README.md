@@ -1,12 +1,14 @@
-Steps to setup the web application [REQUIRED]
-----
-Requirements: node (npm), postgres, linux, git
+Required steps to setup the web application
+-------------------------------------------
+
+Requirements: node, npm, postgres, linux, git
 
 
-1. Ensure node is installed. Locally is preferable, to ensure proper verisons. TODO - add checks for this inside scripts.
+1. Ensure node is installed. Locally is preferable, to ensure proper verisons. 
+TODO - add checks for this inside scripts.
 
 
-    ./install_node.sh
+    sh install_node.sh
 
 
 2. Ensure postgres is installed. This is a bit more involved and hasn't been scripted. This README will loosely guide the steps.
@@ -15,8 +17,9 @@ Requirements: node (npm), postgres, linux, git
 
     sudo apt-get install git
     sudo apt-get install postgresql
-
-    With that last command, on my linux machine, I installed postgres v9.1.  For the necessary changes made post-install, following the instructions here:
+    sudo apt-get install postgresql-server-dev
+    
+    With those two last commands, I installed postgres v9.1 and the server development files needed by the node bindings.  For the necessary changes made post-install, following the instructions here:
     https://help.ubuntu.com/10.04/serverguide/postgresql.html
     Note: I have documented my steps as best as possible here, but you should read the PostgreSQL admin guide if you want more in-depth information that is out of scope for this README. This is by no means a complete setup to secure everything.
 
@@ -43,11 +46,10 @@ Requirements: node (npm), postgres, linux, git
     local   all             all                                     md5 
 
 5. Changed the default postgres user password according to the instructions given in the link above.
-
 6. Execute install_pg_helper.sh to install the roles. The password set in Step 5 is required for this step.
 
 
-    ./install_pg_helper.sh
+    sh install_pg_helper.sh
 
 7. Git clone this repository to the desired location on the server. Change directories to that folder and run: 
 
@@ -60,4 +62,5 @@ Requirements: node (npm), postgres, linux, git
     npm install -g coffee-script@1.6.3
 
 
-9. Create the secret password files to install the schemas, in the config folder.
+9. Create the secrets.js password file in the config folder, necessary to install the schemas.
+
