@@ -1,8 +1,8 @@
 
 
+#Kinisi Data Management Network
 
-API Semantics of Kinisi Data Management Network
-Experimental
+{API Semantics - Experimental}
 
 The core of this API experiment is the desire to build an API that doesn't make a ton of assumptions
 about the underlying storage technology. That said, there are some guarantees that must be reached in 
@@ -15,40 +15,43 @@ are not fixed schema. That is to say, once the schema for a sequence is defined,
 the schema apply (think the relational case). 
 
 First Class Objects
-- document (platform in the prototype)
+- a document (platform in the prototype)
     - Core attributes:
-        (1) uid: universally unique identifier (fixed)
-        (2) name: a short, human-friendly name for the platform (changeable, non-unique, 160 character limit)
-        (3) created: timestamp of when the record was first created (fixed)
-        (4) current: enumeration of 0 {not active}, 1 {active}, 2 {reserved}, 3 {marked for deletion}
-        (5) description: text description (1000 character limit) 
-        (6) meta: storage of variable schema
+        1. uid: universally unique identifier (fixed)
+        2. name: a short, human-friendly name for the platform (changeable, non-unique, 160 character limit)
+        3. created: timestamp of when the record was first created (fixed)
+        3. current: enumeration of 0 {not active}, 1 {active}, 2 {reserved}, 3 {marked for deletion}
+        4. description: text description (1000 character limit) 
+    - Meta attributes: 
+        1. meta: storage of variable schema
 
-- sequences (sequence in the prototype)
+- a sequence (sequence in the prototype)
     - no core attributes, schema defined upon creation
 
-- primitives:
-    integer, float, text, uuid (relation), sequences
+- the primitives
+    - integer, float, text, uuid (relation), sequences
 
 
 Currently Supported Operations
 
+- get a document, given a valid identifier
+- get a subset of all documents to support paging semantics
 - update on documents *
-    (1) create document
-    (2) delete document
-    (3) get document
-    (4) get page in list of all documents
-    (3) change request: 
+    1. create document
+    2. delete document
+    3. get document
+    4. get page in list of all documents
+    5. change request: 
         - add attribute (variable schema) and value
         - delete attribute (and its value)
         - change attribute value
 
+- get a subset of a sequence, given a document identifier
 - update on sequences *
-    (1) create sequence
-    (2) delete sequence
-    (3) change request:
+    1. create sequence
+    2. delete sequence
+    3. change request:
         - append to sequence
-    (4) get a subset of a sequence
 
 
 * because networks can partition & platforms can go offline, there is no guarantee that an update will 
