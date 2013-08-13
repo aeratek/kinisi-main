@@ -11,6 +11,7 @@ express = require('express')
 Routes  = require('./src/routes')
 
 app = express()
+port = process.argv[2] || config.WebService.port
 
 app.configure () ->
     app.set 'title', 'Cypress Hills Air Quality Project'
@@ -44,7 +45,6 @@ app.configure () ->
 app.configure 'development', ->
     app.use express.logger('dev')
         
-app.listen config.WebService.port
-
-console.log 'listening via HTTP on', config.WebService.port
+app.listen port
+console.log 'listening via HTTP on', port
 
