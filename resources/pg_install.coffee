@@ -12,10 +12,12 @@ config = require 'config'
 if process.env.NODE_ENV != 'superuser' and process.env.NODE_ENV != 'test'
     throw new Error 'NODE_ENV not set properly'
 
-schemaScript = """
+extensionScript = """
     create extension if not exists hstore;
     create extension if not exists "uuid-ossp";
-    --
+"""
+
+schemaScript = """
     drop schema if exists kinisi cascade;
     create schema kinisi authorization internal;
     create sequence kinisi.local_salt_seq;
@@ -65,6 +67,12 @@ tableScript = """
 
 # cb takes two arguments (err, result)
 installSchemaDefinitions = (cb) ->
+    withClient 'installing postgres extensions', cb, (client, done) ->
+        client.query extensionScript, (err, result) ->
+            done()
+            cb err, result
+
+installSchemaDefinitions = (cb) ->
     withClient 'installing postgres schema elements', cb, (client, done) ->
         client.query schemaScript, (err, result) ->
             done()
@@ -77,6 +85,7 @@ installTableDefinitions = (cb) ->
             done()
             cb err, result
 
+# SQL function in a separate file
 installFunctions = (cb) ->
     spawn  = require('child_process').spawn
     spawn('psql', ['-f resources/platformFunctions.sql'])
@@ -103,7 +112,10 @@ logger = (err, result) ->
 console.log process.argv
 if process.argv[2] == '--schema'
     installSchemaDefinitions logger
-else
+else if process.argv[2] == '--table'
     installTableDefinitions logger
-    #installFunctions logger
+else if process.argv[2] == '--extension'
+    installExtensions logger
+else if process.argv[2] == '--function'
+    installFunctions logger
 
