@@ -13,7 +13,6 @@ class ChangeRequest
     changeAttr: (attribute, value) ->
         throw new Error 'empty value' if !value
         checkNameOf attribute
-        console.log 'changes', @changes
         @changes[attribute] = value
 
     deleteAttr: (attribute) ->
