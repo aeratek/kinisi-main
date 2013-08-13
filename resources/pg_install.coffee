@@ -16,7 +16,7 @@ schemaScript = """
     create extension if not exists hstore;
     create extension if not exists "uuid-ossp";
     --
-    drop schema kinisi cascade;
+    drop schema if exists kinisi cascade;
     create schema kinisi authorization internal;
     create sequence kinisi.local_salt_seq;
     --
