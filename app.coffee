@@ -1,3 +1,8 @@
+#
+# The main webserving application
+# call with something like:
+#    coffee app.coffee
+#
 
 "use strict"
 

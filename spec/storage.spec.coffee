@@ -1,7 +1,9 @@
 #
 # spec file
 #
+
 "use strict"
+
 config   = require 'config'
 pg       = require 'pg'
 Storage  = require '../dist/src/storage'

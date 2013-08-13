@@ -1,3 +1,8 @@
+#
+# Clients describe changes throught this mapping
+# The storage set of classes actually executes the change
+#
+
 "use strict"
 
 class ChangeRequest

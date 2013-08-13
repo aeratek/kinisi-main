@@ -1,7 +1,9 @@
-#Assumes:
+# Assumes:
 # - postgres 8+ is installed
 # - user roles created
-#Checks:
+# - extensions can be created
+#
+# Checks:
 # - proper environment variable set
 
 pg     = require 'pg'
