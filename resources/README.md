@@ -8,8 +8,8 @@ Requirements: node (npm), postgres, linux, git
 
 On your linux box, run the equivalent packagement tools to install at least the latest version of git and recently modern version of postgres, say 9.X for these scripts.
 
-   * sudo apt-get install git
-   * sudo apt-get install postgresql
+    sudo apt-get install git
+    sudo apt-get install postgresql
 
 With that last command, on my linux machine, I installed postgres v9.1.  For the necessary changes made post-install, following the instructions here:
 https://help.ubuntu.com/10.04/serverguide/postgresql.html
@@ -19,28 +19,34 @@ Note: I have documented my steps as best as possible here, but you should read t
 3. Modify postgresq.conf.
     sudo vim /etc/postgresql/9.1/main/postgresql.conf
 
-On my version, I changed line 59
+On my version, I changed line 59 to remove the hashtag/pound sign.
 
     #listen_addresses = 'localhost' 
 to
+
     listen_addresses = 'localhost'
 
 Note: this should be an external IP address to allow external connections 
  
 
-4) Modify pg_hba.conf.
+4. Modify pg_hba.conf.
+
     sudo vim /etc/postgresql/9.1/main/pg_hba.conf 
 
-changed the first non-commented line to
-     local   all             postgres                                peer
-     local   all             all                                     peer
+changed the first non-commented line to:
+
+    local   all             postgres                                peer
+    local   all             all                                     peer
 to
-     local   all             postgres                                md5 
-     local   all             all                                     md5 
 
-5) Changed the default postgres user password according to the instructions given in the link above.
+    local   all             postgres                                md5 
+    local   all             all                                     md5 
 
-6) Execute install_pg_helper.sh to install the roles. The password set in Step 3 is required for this step.
+5. Changed the default postgres user password according to the instructions given in the link above.
 
-7) Git clone this repository to the desired location on the server. Change directories to that folder and run: 
+6. Execute install_pg_helper.sh to install the roles. The password set in Step 5 is required for this step.
+
+7. Git clone this repository to the desired location on the server. Change directories to that folder and run: 
+
+
     npm install.
