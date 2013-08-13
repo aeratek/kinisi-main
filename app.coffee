@@ -3,8 +3,8 @@
 
 config   = require('config')
 express  = require('express')
-handlers = require('./lib/handlers')
 format   = require('util').format
+Handlers = require('./src/handlers')
 
 app = express()
 
@@ -15,20 +15,26 @@ app.configure () ->
     app.use express.errorHandler()
     app.use express.favicon()
     app.use express.bodyParser uploadDir:'./uploads'
-    
+    #app.use '/static', express.static(__dirname + '/public')
+    app.set 'views', __dirname + '/views'
+    app.engine 'html', require('ejs').renderFile
+
     # register routes here 
     console.log 'registering routes'
     
-    processor = new handlers
-    app.get '/', processor.uploadForm
-    app.post '/', processor.postForm
-    app.get '/eggs', processor.listAll
+    processor = new Handlers()
+    app.get '/', processor.welcome
+    app.get '/form', processor.uploadForm
+    app.post '/upload', processor.postForm
+    ###
+    app.get '/eggs', processor.listByPage
+    app.get '/eggs/p/:page', processor.list
     app.post '/eggs', processor.addNew
-    app.get '/eggs/:eggid', processor.getById
-    app.del '/eggs/:eggid', processor.removeById
-    app.get '/eggs/:eggid/data/:page', processor.getDataByIdAndPage
-    app.post '/eggs/:eggid/data', processor.addDataById
-
+    app.get '/eggs/id/:eggid', processor.getById
+    app.del '/eggs/id/:eggid', processor.removeById
+    app.get '/eggs/id/:eggid/data/:page', processor.getDataByIdAndPage
+    app.post '/eggs/id/:eggid/data', processor.addDataById
+    ###
     console.log 'registration complete'
 
 app.configure 'development', ->

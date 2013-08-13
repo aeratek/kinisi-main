@@ -1,6 +1,7 @@
 #
 # abstract away the data management
 #
+"use strict"
 config = require 'config'
 getmac = require 'getmac'
 pg     = require 'pg'
@@ -22,7 +23,7 @@ class Storage
             else
                 cb 'error querying for identifiers by name=' + name
     
-    # get system identifier
+    # get system identifier - caches this value
     getSystemUuid: (cb) ->
         throw new Error 'invalid arguments' if !cb
         return cb null, @systemuuid if @systemuuid
@@ -34,7 +35,7 @@ class Storage
             else
                 cb 'error querying for system key - db is likely corrupt'
     
-    # atomicall create a new platform, returns its initial state
+    # atomic call to create a new platform, returns its initial state
     createPlatform: (name, cb) ->
         throw new Error 'invalid arguments' if !cb or !name
         # pass in the mac address for the stored procedure
@@ -59,7 +60,7 @@ class Storage
             else
                 cb 'error getting platforms for page=' + page + ', count=' + count
     
-    # returns an array of length one and only one platform, assuming it exists,
+    # returns an array of length with one platform, assuming it exists,
     # otherwise returns the empty array
     getPlatform: (uid, cb) ->
         throw new Error 'invalid arguments' if !cb or !uid
@@ -68,13 +69,17 @@ class Storage
                 cb null, result.rows || []
             else
                 cb 'error querying for platform by uid=' + uid
-
+    
+    # create a change request for modifications
+    createChange: (uuid) ->
+        return new ChangeRequest(uuid)
+                
     # calling this prevents anymore connections for the life of the process
     exit: ->
         pg.end()
     
     
-    # private: handle pg-client pooling
+    # private method: handle pg-client pooling
     query = (statement, parameters, cb) ->
         if typeof parameters is 'function'
             cb = parameters

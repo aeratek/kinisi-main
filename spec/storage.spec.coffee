@@ -1,6 +1,7 @@
 #
 # spec file
 #
+"use strict"
 config   = require 'config'
 pg       = require 'pg'
 Storage  = require '../dist/src/storage'
@@ -81,9 +82,12 @@ describe 'storage class', ->
         expect(test.storage.updatePlatform).toThrow()
 
     it 'should reject updates to non-existent platforms', (done) ->
-        test.storage.update '4a9768be-ff09-11e2-bb0a-001b639514a9', (done) ->
+        cr = test.storage.createChange '4a9768be-ff09-11e2-bb0a-001b639514a9'
+        cr.addAttribute 'foo', 'a'
+        cr.addAttribute 'foo', 'b'
+        test.storage.update cr, (err, result) ->
             expect(err).toBeNull()
-            expect(result).toBeFalsy()
+            expect(result).toEqual 1
 
     it 'should accept updates to known platforms' -> (done) ->
         test.storage.update
