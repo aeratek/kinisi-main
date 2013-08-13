@@ -117,5 +117,6 @@ else if process.argv[2] == '--table'
 else if process.argv[2] == '--extension'
     installExtensionDefinitions logger
 else if process.argv[2] == '--function'
+    return console.error 'insufficient arguments: sql table name required' if !process.argv[3]
     installFunctions process.argv[3], logger
 
