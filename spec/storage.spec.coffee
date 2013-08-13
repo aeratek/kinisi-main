@@ -80,16 +80,17 @@ describe 'storage class', ->
             expect(platform.length).toEqual 0
             done()
     
-    it 'should throw an error when searching with a null uuid', ->
-        expect(test.storage.updatePlatform).toThrow()
+    it 'should throw an error when updating with no arguments', ->
+        expect(test.storage.update).toThrow()
 
     it 'should reject updates to non-existent platforms', (done) ->
         cr = test.storage.createChange '4a9768be-ff09-11e2-bb0a-001b639514a9'
-        cr.addAttribute 'foo', 'a'
-        cr.addAttribute 'foo', 'b'
+        cr.changeAttr 'foo', 'a'
+        cr.changeAttr 'foo', 'b'
         test.storage.update cr, (err, result) ->
             expect(err).toBeNull()
             expect(result).toEqual 1
+            done()
 
     #it 'should accept updates to known platforms' -> (done) ->
     #    test.storage.update

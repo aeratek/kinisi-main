@@ -40,3 +40,4 @@ class Routes
     # '/eggs/id/:eggid/data/:page', processor.getDataByIdAndPage
     # '/eggs/id/:eggid/data', processor.addDataById
 module.exports = Routes
+

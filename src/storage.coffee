@@ -5,7 +5,7 @@
 config = require 'config'
 getmac = require 'getmac'
 pg     = require 'pg'
-ChageRequest = require 'cr'
+ChangeRequest = require './cr'
 
 
 class Storage
@@ -74,7 +74,12 @@ class Storage
     # create a change request for modifications
     createChange: (uuid) ->
         return new ChangeRequest(uuid)
-                
+    
+    # submit the change to the data layer
+    update: (change, cb) ->
+        throw new Error 'invalid arguments' if !cb or !change
+        cb 'unsupported error!'
+
     # calling this prevents anymore connections for the life of the process
     exit: ->
         pg.end()
