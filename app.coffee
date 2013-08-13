@@ -6,10 +6,9 @@
 
 "use strict"
 
-config   = require('config')
-express  = require('express')
-format   = require('util').format
-Routes = require('./src/routes')
+config  = require('config')
+express = require('express')
+Routes  = require('./src/routes')
 
 app = express()
 
