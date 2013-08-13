@@ -66,7 +66,7 @@ tableScript = """
     """
 
 # cb takes two arguments (err, result)
-installSchemaDefinitions = (cb) ->
+installExtensionDefinitions = (cb) ->
     withClient 'installing postgres extensions', cb, (client, done) ->
         client.query extensionScript, (err, result) ->
             done()
@@ -115,7 +115,7 @@ if process.argv[2] == '--schema'
 else if process.argv[2] == '--table'
     installTableDefinitions logger
 else if process.argv[2] == '--extension'
-    installExtensions logger
+    installExtensionDefinitions logger
 else if process.argv[2] == '--function'
     installFunctions process.argv[3], logger
 
