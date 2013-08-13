@@ -2,10 +2,11 @@
 # Handles routes
 #
 
-config = require 'config'
-#jobservice = require './jobservice'
+"use strict"
 
-class Handlers
+config = require 'config'
+
+class Routes
 
     # '/', processor.welcomeJson
     welcome: (request, response) ->
@@ -38,4 +39,4 @@ class Handlers
     # '/eggs/id/:eggid', processor.removeById
     # '/eggs/id/:eggid/data/:page', processor.getDataByIdAndPage
     # '/eggs/id/:eggid/data', processor.addDataById
-module.exports = Handlers
+module.exports = Routes

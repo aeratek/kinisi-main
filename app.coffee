@@ -9,7 +9,7 @@
 config   = require('config')
 express  = require('express')
 format   = require('util').format
-Handlers = require('./src/handlers')
+Routes = require('./src/routes')
 
 app = express()
 
@@ -27,18 +27,18 @@ app.configure () ->
     # register routes here 
     console.log 'registering routes'
     
-    processor = new Handlers()
-    app.get '/', processor.welcome
-    app.get '/form', processor.uploadForm
-    app.post '/upload', processor.postForm
+    routes = new Routes()
+    app.get '/', routes.welcome
+    app.get '/form', routes.uploadForm
+    app.post '/upload', routes.postForm
     ###
-    app.get '/eggs', processor.listByPage
-    app.get '/eggs/p/:page', processor.list
-    app.post '/eggs', processor.addNew
-    app.get '/eggs/id/:eggid', processor.getById
-    app.del '/eggs/id/:eggid', processor.removeById
-    app.get '/eggs/id/:eggid/data/:page', processor.getDataByIdAndPage
-    app.post '/eggs/id/:eggid/data', processor.addDataById
+    app.get '/eggs', routes.listByPage
+    app.get '/eggs/p/:page', routes.list
+    app.post '/eggs', routes.addNew
+    app.get '/eggs/id/:eggid', routes.getById
+    app.del '/eggs/id/:eggid', routes.removeById
+    app.get '/eggs/id/:eggid/data/:page', routes.getDataByIdAndPage
+    app.post '/eggs/id/:eggid/data', routes.addDataById
     ###
     console.log 'registration complete'
 
