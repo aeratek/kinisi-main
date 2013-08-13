@@ -5,8 +5,8 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "node app.js",
-    "test": "test.js"
+    "start": "coffee app.coffee",
+    "test": "./node_modules/jasmine-node/bin/jasmine-node --color --coffee spec"
   },
   "dependencies": {
     "config": "0.4.x",

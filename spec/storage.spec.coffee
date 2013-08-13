@@ -91,8 +91,8 @@ describe 'storage class', ->
             expect(err).toBeNull()
             expect(result).toEqual 1
 
-    it 'should accept updates to known platforms' -> (done) ->
-        test.storage.update
+    #it 'should accept updates to known platforms' -> (done) ->
+    #    test.storage.update
 
     # this spec always has to be last - stop the pg background pool
     it 'should be able to release all resources permanently', ->
