@@ -64,9 +64,27 @@ Requirements: node, npm, postgres, linux, git
 
 
 9. Create the secrets.js password file in the config folder, necessary to install the schemas.
-10. Install the schema necessary by running the following line:
+10. Install the schema and table definitions necessary by running the following commands:
 
 
-        export NODE_ENV=superuser; coffee resources/pg_install.coffee
+        export NODE_ENV=superuser 
+        coffee resources/pg_install.coffee --extension
+        coffee resources/pg_install.coffee --schema
+        coffee resources/pg_install.coffee --table
+        coffee resources/pg_install.coffee --function platform
+
+    Sometimes, creating the extensions does work as scripted, hence the multiple steps. If installing the extensions does not work because of an older version of postgresql, then refer to this link on how to install the contrib modules:
+    http://www.postgresql.org/docs/8.3/static/contrib.html
+    
+11. Optional - Run the tests to make sure everything is working as expected.
+
+        
+        export NODE_ENV=test
+        # the installation only has to be run once
+        coffee resources/pg_install.coffee --extension
+        coffee resources/pg_install.coffee --schema
+        coffee resources/pg_install.coffee --table
+        coffee resources/pg_install.coffee --function platformtest
+        npmtest
         
         
