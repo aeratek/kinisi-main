@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "start": "coffee app.coffee",
-    "make-test": "mkdir -p dist/src; coffee -o dist/src --compile src 
+    "make-test": "mkdir -p dist/src; coffee -o dist/src --compile src",
     "test": "./node_modules/jasmine-node/bin/jasmine-node --color --coffee spec"
   },
   "dependencies": {
