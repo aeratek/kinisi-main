@@ -5,6 +5,7 @@
 config = require 'config'
 getmac = require 'getmac'
 pg     = require 'pg'
+ChageRequest = require 'cr'
 
 
 class Storage
