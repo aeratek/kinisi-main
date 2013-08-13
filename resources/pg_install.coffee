@@ -88,7 +88,7 @@ installTableDefinitions = (cb) ->
 # SQL function in a separate file
 installFunctions = (cb) ->
     spawn  = require('child_process').spawn
-    spawn('psql', ['-f resources/platformFunctions.sql'])
+    spawn('psql', ['-U internal', '-f resources/platformFunctions.sql'])
         .on 'close', (code) ->
             error = 'exit error ' + code if code != 0
             cb error, code
