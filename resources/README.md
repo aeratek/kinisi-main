@@ -58,4 +58,6 @@ Requirements: node (npm), postgres, linux, git
 
 
     npm install -g coffee-script@1.6.3
-    
+
+
+9. Create the secret password files to install the schemas, in the config folder.
