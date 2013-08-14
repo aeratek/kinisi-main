@@ -4,6 +4,10 @@
   "author": "Bryan Valentini <bryan@kinisi.cc>",
   "version": "0.0.1",
   "private": true,
+  "repository": {
+      "type": "git",
+      "url": "https://github.com/transistorize/kinisi-main.git"
+  },
   "scripts": {
     "start": "coffee app.coffee",
     "test": "mkdir -p dist/src; coffee -o dist/src --compile src; ./node_modules/jasmine-node/bin/jasmine-node --color --coffee spec"
