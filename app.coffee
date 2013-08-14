@@ -16,11 +16,11 @@ port = process.argv[2] || config.WebService.port
 app.configure () ->
     app.set 'title', 'Cypress Hills Air Quality Project'
 
-    #app.use express.basicAuth 'chaq_admin', 'eggsarefun'
+    console.log 'upload directory', config.WebService.uploadsDir
+
     app.use express.errorHandler()
     app.use express.favicon()
     app.use express.bodyParser uploadDir: config.WebService.uploadsDir
-    #app.use '/static', express.static(__dirname + '/public')
     app.set 'views', __dirname + '/views'
     app.engine 'html', require('ejs').renderFile
 
