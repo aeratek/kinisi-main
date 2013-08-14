@@ -19,7 +19,7 @@ app.configure () ->
     #app.use express.basicAuth 'chaq_admin', 'eggsarefun'
     app.use express.errorHandler()
     app.use express.favicon()
-    app.use express.bodyParser uploadDir:'./uploads'
+    app.use express.bodyParser uploadDir: config.WebService.uploadsDir
     #app.use '/static', express.static(__dirname + '/public')
     app.set 'views', __dirname + '/views'
     app.engine 'html', require('ejs').renderFile

@@ -1,7 +1,9 @@
 #
 # abstract away the data management
 #
+
 "use strict"
+
 config = require 'config'
 getmac = require 'getmac'
 pg     = require 'pg'
