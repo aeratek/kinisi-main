@@ -34,8 +34,6 @@ app.configure () ->
     app.get '/eggs/p/:page?*', routes.listByPage
     app.get '/eggs/uid/:uid', routes.getByUid
     app.get '/eggs/id/:pid', routes.getById
-    #app.get '/eggs/uid/:uid', routes.getDataByUidAndPage
-    
     app.get '/eggs/uid/:uid/data/:page?*', routes.getDataByUidAndPage
 
     app.post '/upload', routes.postForm
