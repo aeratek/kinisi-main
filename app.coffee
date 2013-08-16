@@ -30,21 +30,27 @@ app.configure () ->
     routes = new Routes()
     app.get '/', routes.welcome
     app.get '/form', routes.uploadForm
+    app.get '/eggs', routes.listByPage
+    app.get '/eggs/p/:page?*', routes.listByPage
+    app.get '/eggs/uid/:uid', routes.getByUid
+    app.get '/eggs/id/:pid', routes.getById
+    #app.get '/eggs/uid/:uid', routes.getDataByUidAndPage
+    
+    app.get '/eggs/uid/:uid/data/:page?*', routes.getDataByUidAndPage
+
     app.post '/upload', routes.postForm
     ###
-    app.get '/eggs', routes.listByPage
-    app.get '/eggs/p/:page', routes.list
     app.post '/eggs', routes.addNew
-    app.get '/eggs/id/:eggid', routes.getById
-    app.del '/eggs/id/:eggid', routes.removeById
-    app.get '/eggs/id/:eggid/data/:page', routes.getDataByIdAndPage
-    app.post '/eggs/id/:eggid/data', routes.addDataById
+    app.del '/eggs/id/:pid', routes.removeById
+    app.post '/eggs/id/:pid/data', routes.addDataById
     ###
     console.log 'registration complete'
 
 app.configure 'development', ->
     app.use express.logger('dev')
         
+
 app.listen port
+
 console.log 'listening via HTTP on', port
 

@@ -5,8 +5,12 @@
 "use strict"
 
 config = require 'config'
+Storage = require './storage'
 
 class Routes
+
+    constructor: ->
+        @storage = new Storage()
 
     # '/', processor.welcomeJson
     welcome: (request, response) ->
@@ -15,13 +19,12 @@ class Routes
     # '/form', processor.uploadForm
     uploadForm: (request, response) ->
         response.set 'Content-Type', 'text/html'
-        response.render 'form.html'
+        response.render 'form.ejs'
 
     # '/upload', processor.postForm
     postForm:  (request, response) ->
-        console.log request.files
+        console.log 'data_present=', request.files.eggdata?
         if request.files.eggdata
-            console.log 'found parsed egg data'
             meta = request.files.eggdata
             response.json
                 status: 'upload successful'
@@ -32,12 +35,44 @@ class Routes
             response.status(500).send
                 error: 'uploaded data not parsed correctly, please contact your administrator'
 
-    # '/eggs', processor.listByPage
-    # '/eggs/p/:page', processor.list
-    # '/eggs', processor.addNew
-    # '/eggs/id/:eggid', processor.getById
-    # '/eggs/id/:eggid', processor.removeById
-    # '/eggs/id/:eggid/data/:page', processor.getDataByIdAndPage
-    # '/eggs/id/:eggid/data', processor.addDataById
+    # '/eggs/p/:page', processor.listByPage
+    listByPage: (request, response) =>
+        page = +request.params.page || 0
+        @storage.getPlatforms page, 20, (err, platforms) ->
+            if !err
+                response.send 'platforms': platforms, 'page': page
+            else
+                response.status(500).send error: 'internal server error: ' + err
+
+    #'/eggs/id/:pid', processor.getById
+    getById: (request, response) =>
+        return response.status(404).send 'resource not found' if !request.params.pid
+        @storage.getPlatformById +request.params.pid, (err, platform) ->
+            if !err
+                response.send 'platforms': platform
+            else
+                response.status(500).send error: 'internal server error: ' + err
+
+    #'/eggs/uid/:uid', processor.getByUid
+    getByUid: (request, response) =>
+        return response.status(404).send 'resource not found' if !request.params.uid
+        @storage.getPlatformByUid request.params.uid, (err, platform) ->
+            if !err
+                response.send 'platforms': platform
+            else
+                response.status(500).send error: 'internal server error: ' + err
+    
+    # '/eggs/uid/:uid/data/:page', processor.getDataByIdAndPage
+    getDataByUidAndPage: (request, response) =>
+        return response.status(404).send 'resource not found' if !request.params.uid
+        page = + request.params.page || 0
+        uid = request.params.uid
+        @storage.getDataByUidAndPage uid, page, (err, data) ->
+            if !err
+                response.send 'uid': uid, 'data': data
+            else
+                response.status(500).send error: 'internal server error: ' + err
+
+    # '/eggs/id/:pid/data', processor.addDataById
 module.exports = Routes
 

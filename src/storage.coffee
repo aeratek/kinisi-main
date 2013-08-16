@@ -27,7 +27,7 @@ class Storage
                 cb 'error querying for identifiers by name=' + name
     
     # get system identifier - caches this value
-    getSystemUuid: (cb) ->
+    getSystemUuid: (cb) =>
         throw new Error 'invalid arguments' if !cb
         return cb null, @systemuuid if @systemuuid
         #note: wide arrow for function callback
@@ -63,9 +63,9 @@ class Storage
             else
                 cb 'error getting platforms for page=' + page + ', count=' + count
     
-    # returns an array of length with one platform, assuming it exists,
+    # returns an array of length one, one platform, assuming it exists,
     # otherwise returns the empty array
-    getPlatform: (uid, cb) ->
+    getPlatformByUid: (uid, cb) ->
         throw new Error 'invalid arguments' if !cb or !uid
         query 'select * from dim.platform where uid = $1::uuid limit 1', [uid], (err, result) ->
             if !err
@@ -73,6 +73,34 @@ class Storage
             else
                 cb 'error querying for platform by uid=' + uid
     
+    # returns an array of length one, one platform, assuming it exists,
+    # otherwise returns the empty array
+    getPlatformById: (id, cb) ->
+        throw new Error 'invalid arguments' if !cb or !id
+        query 'select * from dim.platform where id = $1::int limit 1', [id], (err, result) ->
+            if !err
+                cb null, result.rows || []
+            else
+                cb 'error querying for platform by id=' + id
+
+    getDataByUidAndPage: (uid, page, cb) ->
+        throw new Error 'invalid arguments' if !cb or !uid
+        console.log 'routed called getDataByUidAndPage'
+        page = page || 0
+        count = 5000
+
+        ## TODO cache uid -> data table mapping
+        ## TODO data tables should reflect schema set by needs of specific platform, which will vary platform to platform
+        query 'select id from dim.platform where uid = $1::uuid limit 1', [uid], (err, result) =>
+            console.log 'found platform', uid, result.rows[0]?.id
+            return  cb 'error finding platform data table for uid=' + uid if err || !result || !result.rows[0]?.id
+            query 'select * from fact.egg_data where platform_id = $1::int limit $2::int offset $3::int', [result.rows[0]?.id, count, count * page], (err, result) ->
+                if !err
+                    cb null, result.rows || []
+                else
+                    console.log 'got here'
+                    cb 'error querying for platform data by uid=' + uid
+               
     # create a change request for modifications
     createChange: (uuid) ->
         return new ChangeRequest(uuid)

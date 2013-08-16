@@ -23,7 +23,7 @@ begin
      
     insert into dim.platform (uid, name, created, current)
          values (nuid, platform_name, ntime, 1::bit(2));
-
+    
     return query select * from dim.platform where uid = nuid;
 end;
 $$ language plpgsql;

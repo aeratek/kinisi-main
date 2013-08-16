@@ -7,4 +7,5 @@ module.exports =
         uploadsDir: './uploads'
     
     Postgres:
-        connection: "postgres://#{secrets.PG.app.username}:#{secrets.PG.app.password}@localhost:5432/platform"
+        connection: "postgres://#{secrets.PG.app.user}:#{secrets.PG.app.password}@localhost:5432/platform"
+
