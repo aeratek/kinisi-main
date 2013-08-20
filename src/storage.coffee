@@ -40,6 +40,7 @@ class Storage
     
     # atomic call to create a new platform, returns its initial state
     createPlatform: (name, cb) ->
+        "use strinct"
         throw new Error 'invalid arguments' if !cb or !name
         # pass in the mac address for the stored procedure
         getmac.getMac (err, macAddress) =>
@@ -85,22 +86,51 @@ class Storage
 
     getDataByUidAndPage: (uid, page, cb) ->
         throw new Error 'invalid arguments' if !cb or !uid
-        console.log 'routed called getDataByUidAndPage'
+        
         page = page || 0
         count = 5000
 
         ## TODO cache uid -> data table mapping
         ## TODO data tables should reflect schema set by needs of specific platform, which will vary platform to platform
         query 'select id from dim.platform where uid = $1::uuid limit 1', [uid], (err, result) =>
-            console.log 'found platform', uid, result.rows[0]?.id
             return  cb 'error finding platform data table for uid=' + uid if err || !result || !result.rows[0]?.id
-            query 'select * from fact.egg_data where platform_id = $1::int limit $2::int offset $3::int', [result.rows[0]?.id, count, count * page], (err, result) ->
-                if !err
-                    cb null, result.rows || []
-                else
-                    console.log 'got here'
-                    cb 'error querying for platform data by uid=' + uid
-               
+            query 'select * from fact.egg_data where platform_id = $1::int limit $2::int offset $3::int',
+                [result.rows[0]?.id, count, count * page], (err, result) ->
+                    if !err
+                        cb null, result.rows || []
+                    else
+                        cb 'error querying for platform data by uid=' + uid
+    
+    getDataByColumn: (col, cb) ->
+        throw new Error 'invalid arguments' if !cb or !col
+        cb 'illegal column name' + col unless isLegalName(col)
+
+        # have to split up the postgre regex to work around strict mode
+        regex = '([\\' + 'd-]*)\\' + 's([\\' + 'd:]*)'
+        replacement = '\\' + '1T\\' + '2Z'
+        query """
+            with raw_data as (
+                select platform_id, ts, #{col} 
+                from fact.egg_data 
+                order by platform_id, ts
+            ), data as (
+                select platform_id, array_agg(row(
+                    regexp_replace((ts at time zone 'gmt')::text, $1, $2), #{col})) 
+                    as values 
+                from raw_data
+                group by platform_id
+            )
+            select uid, values 
+            from data d 
+            join dim.platform p on p.id = d.platform_id
+            order by uid;
+        """, [regex, replacement], (err, result) =>
+            if !err
+                cb null, splitToArrayOfValues(col, result.rows || [])
+            else
+                cb 'error querying for platform by data column=' + col
+                
+
     # create a change request for modifications
     createChange: (uuid) ->
         return new ChangeRequest(uuid)
@@ -114,6 +144,27 @@ class Storage
     exit: ->
         pg.end()
     
+    #
+    # private
+    #
+    
+    #split into maps
+    splitToArrayOfValues = (col, rows) ->
+        rows?.forEach (complex) =>
+            length = complex.values?.length
+            if length > 0
+                complex.values = complex.values.slice(2, length - 2).split('\",\"')
+                complex.values?.forEach (elem, index, arr) =>
+                    length = elem.length
+                    [ts, value] = elem.slice(1, length - 1).split(',')
+                    arr[index] = { 'ts' : ts }
+                    arr[index][col] = value
+        rows
+
+
+    # handles checking column names, returns true or false
+    isLegalName = (col) ->
+        return /^co$|^co_raw$|^no2$|^no2_raw$|^voc$|^voc_raw$|^humidity$|^temp_degc$/.test(col)
     
     # private method: handle pg-client pooling
     query = (statement, parameters, cb) ->

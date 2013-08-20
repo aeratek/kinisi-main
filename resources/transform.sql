@@ -25,7 +25,7 @@ drop table staging.egg_data;
 
 with transformed as (
     select
-    ts::timestamp,
+    ts::timestamp with time zone,
     -- change the platform_id to match it up with 
     -- the correct platform
     6::int as platform_id,

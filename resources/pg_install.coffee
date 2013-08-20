@@ -84,7 +84,7 @@ tableScript = """
     -- temporary tables to support AQE project
     drop table if exists fact.egg_data cascade;
     create table fact.egg_data (
-        ts timestamp not null,
+        ts timestamp with time zone not null,
         platform_id integer references dim.platform(id),
         temp_degc numeric,
         humidity numeric,

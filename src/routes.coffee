@@ -9,8 +9,23 @@ Storage = require './storage'
 
 class Routes
 
-    constructor: ->
+    constructor: (app) ->
         @storage = new Storage()
+        app.get '/', @welcome
+        app.get '/form', @uploadForm
+        app.get '/eggs', @listByPage
+        app.get '/eggs/p/:page?*', @listByPage
+        app.get '/eggs/uid/:uid', @getByUid
+        app.get '/eggs/id/:pid', @getById
+        app.get '/eggs/uid/:uid/data/:page?*', @getDataByUidAndPage
+        app.get '/query/col/:column', @getDataByColumn
+        app.post '/upload', @postForm
+    
+        ###
+        app.post '/eggs', routes.addNew
+        app.del '/eggs/id/:pid', routes.removeById
+        app.post '/eggs/id/:pid/data', routes.addDataById
+        ###
 
     # '/', processor.welcomeJson
     welcome: (request, response) ->
@@ -65,11 +80,21 @@ class Routes
     # '/eggs/uid/:uid/data/:page', processor.getDataByIdAndPage
     getDataByUidAndPage: (request, response) =>
         return response.status(404).send 'resource not found' if !request.params.uid
-        page = + request.params.page || 0
+        page = +request.params.page || 0
         uid = request.params.uid
         @storage.getDataByUidAndPage uid, page, (err, data) ->
             if !err
                 response.send 'uid': uid, 'data': data
+            else
+                response.status(500).send error: 'internal server error: ' + err
+    
+    # '/query/col/:column'
+    getDataByColumn: (request, response) =>
+        return response.status(404).send 'resource not found' if !request.params.column
+        column = request.params.column
+        @storage.getDataByColumn column, (err, data) ->
+            if !err
+                response.send 'query': column, 'data': data
             else
                 response.status(500).send error: 'internal server error: ' + err
 
