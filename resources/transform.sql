@@ -21,7 +21,7 @@ from '/tmp/CHAQ_10.TXT'
 with CSV
 ;
 
-drop table staging.egg_data;
+drop table if exists staging.egg_data;
 
 with transformed as (
     select

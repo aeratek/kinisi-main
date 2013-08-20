@@ -159,6 +159,9 @@ logger = (err, result) ->
 
 # MAIN 
 console.log process.argv
+console.log()
+
+
 if process.argv[2] == '--schema'
     installSchemaDefinitions logger
 else if process.argv[2] == '--table'
